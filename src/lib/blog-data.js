@@ -1,0 +1,134 @@
+
+export const blogs = [
+    // Business
+    {
+        id: 1,
+        category: "business",
+        title: "The Rise of Remote Work Economies",
+        description: "How remote work is reshaping global economies and local businesses.",
+        content: "Remote work has transformed from a perk to a necessity, and now to a standard operating procedure. This shift is not just about where we work, but how we define productivity, collaboration, and work-life balance...",
+        author: "Sarah Jenkins",
+        date: "Oct 24, 2023",
+        readTime: "5 min",
+    },
+    {
+        id: 2,
+        category: "business",
+        title: "AI in Stock Market Predictions",
+        description: "Can artificial intelligence really predict the next big market crash?",
+        content: "Financial analysts have long used models to predict market trends. Now, AI is processing unstructured data from news, social media, and earnings calls to give traders an edge...",
+        author: "Michael Ross",
+        date: "Oct 22, 2023",
+        readTime: "7 min",
+    },
+
+    // Technology
+    {
+        id: 3,
+        category: "technology",
+        title: "The Quantum Leap: Computing's Next Frontier",
+        description: "Understanding the basics of quantum computing and its potential impact.",
+        content: "Quantum computers leverage the principles of superposition and entanglement to solve problems that are currently impossible for classical computers. From drug discovery to cryptography...",
+        author: "David Chen",
+        date: "Oct 25, 2023",
+        readTime: "8 min",
+    },
+    {
+        id: 4,
+        category: "technology",
+        title: "5G and the IoT Revolution",
+        description: "How 5G networks are enabling the true potential of the Internet of Things.",
+        content: "The rollout of 5G is not just about faster phone internet. It's the backbone for autonomous vehicles, smart cities, and industrial automation...",
+        author: "Emily White",
+        date: "Oct 20, 2023",
+        readTime: "6 min",
+    },
+
+    // Sports
+    {
+        id: 5,
+        category: "sports",
+        title: "Moneyball 2.0: AI in Sports Analytics",
+        description: "How data science is dictating player transfers and game strategies.",
+        content: "Gone are the days of gut-feeling scouting. Today's teams track every movement of every player on the pitch to optimize performance and minimize injury risk...",
+        author: "Marcus Johnson",
+        date: "Oct 23, 2023",
+        readTime: "5 min",
+    },
+    {
+        id: 6,
+        category: "sports",
+        title: " The Psychology of the Elite Athlete",
+        description: "What separates the good from the great? It's often in the mind.",
+        content: "Physical prowess is the baseline. Mental resilience, focus, and the ability to perform under extreme pressure are what define champions...",
+        author: "Dr. Lisa Ray",
+        date: "Oct 19, 2023",
+        readTime: "6 min",
+    },
+
+    // Entertainment
+    {
+        id: 7,
+        category: "entertainment",
+        title: "The Golden Age of Streaming",
+        description: "Are we seeing too much content? The saturation of streaming services.",
+        content: "With every major studio launching its own platform, consumers are facing subscription fatigue. Quality vs quantity is the new battleground...",
+        author: "Chris Evans",
+        date: "Oct 21, 2023",
+        readTime: "4 min",
+    },
+    {
+        id: 8,
+        category: "entertainment",
+        title: "Virtual Reality Concerts",
+        description: "The future of live music might just be in your living room.",
+        content: "Artists like Travis Scott and Ariana Grande have shown that virtual concerts can draw millions. Is this the future of touring?...",
+        author: "Jessica Lee",
+        date: "Oct 18, 2023",
+        readTime: "5 min",
+    },
+
+    // Health
+    {
+        id: 9,
+        category: "health",
+        title: "The Gut-Brain Connection",
+        description: "New research suggests your diet affects your mental health more than you think.",
+        content: "The microbiome is often called the 'second brain'. What you eat directly influences your mood, anxiety levels, and cognitive function...",
+        author: "Dr. Patel",
+        date: "Oct 24, 2023",
+        readTime: "7 min",
+    },
+    {
+        id: 10,
+        category: "health",
+        title: "Sleep: The Underrated Performance Enhancer",
+        description: "Why sleeping less is not the hack to productivity you think it is.",
+        content: "Sleep deprivation affects decision making, reaction time, and emotional stability. Elite performers prioritize sleep as part of their training...",
+        author: "Sarah Conner",
+        date: "Oct 17, 2023",
+        readTime: "6 min",
+    },
+
+    // Science
+    {
+        id: 11,
+        category: "science",
+        title: "CRISPR and the Ethics of Gene Editing",
+        description: "We have the technology to edit life. Should we?",
+        content: "CRISPR-Cas9 has made gene editing accessible and cheap. But the potential for 'designer babies' and ecological disruption raises massive ethical questions...",
+        author: "Prof. Alan Grant",
+        date: "Oct 26, 2023",
+        readTime: "9 min",
+    },
+    {
+        id: 12,
+        category: "science",
+        title: "The Search for Extraterrestrial Life",
+        description: "New telescopes are scanning the universe for signs of life.",
+        content: "From the James Webb telescope to SETI, humanity is looking deeper into the cosmos than ever before. Are we alone?...",
+        author: "Ellie Arroway",
+        date: "Oct 15, 2023",
+        readTime: "8 min",
+    },
+];
