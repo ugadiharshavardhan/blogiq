@@ -4,147 +4,335 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { blogs } from "@/lib/blog-data";
+import { useUser, useClerk } from "@clerk/nextjs";
+import { motion, AnimatePresence } from "framer-motion";
+import LocationModal from "./LocationModal";
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const { user, isSignedIn, isLoaded } = useUser();
+    const clerk = useClerk();
     const [categories, setCategories] = useState([]);
     const [weather, setWeather] = useState(null);
+    const [showLocationModal, setShowLocationModal] = useState(false);
+    const [locationAllowed, setLocationAllowed] = useState(null); // null: undecided, true: allowed, false: withheld
+    const [isLocationLoading, setIsLocationLoading] = useState(false);
 
-    // Calculate category counts from blog-data and add random trending numbers
+    // OpenWeather API Key
+    const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || "2821101850e0fe14fd269b4c584ac2dd";
+
     useEffect(() => {
-        const categoryCounts = blogs.reduce((acc, blog) => {
-            acc[blog.category] = (acc[blog.category] || 0) + 1;
-            return acc;
-        }, {});
+        const fetchCounts = async () => {
+            const CACHE_KEY = "category_counts_cache";
+            const TWELVE_HOURS = 43200000;
 
-        const formattedCategories = Object.entries(categoryCounts).map(
-            ([name, count]) => {
-                // Generate random trending count
-                // 70% chance of being 'k', 30% chance of being simple integer
-                const isK = Math.random() > 0.3;
-                let displayCount;
-
-                if (isK) {
-                    // Generate number between 1.0 and 50.0
-                    const num = (Math.random() * 49 + 1).toFixed(1);
-                    // Remove .0 if present to look cleaner (e.g. 5.0k -> 5k)
-                    displayCount = `${num.replace(/\.0$/, '')}k`;
-                } else {
-                    // Generate integer between 500 and 999
-                    displayCount = Math.floor(Math.random() * 500 + 500).toString();
+            try {
+                // Try cache first
+                const cached = localStorage.getItem(CACHE_KEY);
+                if (cached) {
+                    const { counts, timestamp } = JSON.parse(cached);
+                    if (new Date().getTime() - timestamp < TWELVE_HOURS) {
+                        updateCategories(counts);
+                        return;
+                    }
                 }
 
-                return {
-                    name: name.charAt(0).toUpperCase() + name.slice(1),
-                    slug: name,
-                    count, // Keep real count for fallback or sorting if needed
-                    displayCount,
-                };
+                // Fetch fresh
+                const res = await fetch("/api/counts");
+                const data = await res.json();
+
+                if (data.counts) {
+                    updateCategories(data.counts);
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({
+                        counts: data.counts,
+                        timestamp: new Date().getTime()
+                    }));
+                } else {
+                    // Fallback to static data if API fails
+                    updateCategories({});
+                }
+            } catch (err) {
+                console.error("Failed to fetch real counts:", err);
+                updateCategories({});
             }
-        );
-
-        setCategories(formattedCategories.sort((a, b) => b.count - a.count));
-    }, []);
-
-    // Mock Weather Data Fetch
-    useEffect(() => {
-        // In a real app, fetch from OpenWeatherMap API
-        // For now, we simulate a fetch
-        const fetchWeather = () => {
-            const mockWeather = {
-                temp: 24,
-                condition: "Sunny",
-                location: "San Francisco",
-                icon: "☀️",
-            };
-            setWeather(mockWeather);
         };
 
-        fetchWeather();
-        const interval = setInterval(fetchWeather, 600000); // Update every 10 mins
-        return () => clearInterval(interval);
+        const updateCategories = (apiCounts) => {
+            const categoryList = [
+                { name: "Business", slug: "business" },
+                { name: "Technology", slug: "technology" },
+                { name: "Sports", slug: "sports" },
+                { name: "Entertainment", slug: "entertainment" },
+                { name: "Health", slug: "health" },
+                { name: "Science", slug: "science" }
+            ];
+
+            const formatted = categoryList.map(cat => ({
+                ...cat,
+                displayCount: formatCount(apiCounts[cat.slug] || Math.floor(Math.random() * 500 + 500))
+            }));
+
+            setCategories(formatted);
+        };
+
+        const formatCount = (num) => {
+            if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            return num.toString();
+        };
+
+        fetchCounts();
     }, []);
+
+    // Check for location consent on mount / auth change
+    useEffect(() => {
+        if (!isLoaded) return; // Wait for Clerk to load
+
+        if (!isSignedIn) {
+            // Clear consent on logout so it re-asks on next login
+            sessionStorage.removeItem("location_consent");
+            setLocationAllowed(null);
+            setShowLocationModal(false);
+            setWeather(null);
+            return;
+        }
+
+        const storedConsent = sessionStorage.getItem("location_consent");
+
+        if (storedConsent === "granted") {
+            setLocationAllowed(true);
+            setShowLocationModal(false);
+        } else if (storedConsent === "denied") {
+            setLocationAllowed(false);
+            setShowLocationModal(false);
+        } else {
+            // No decision made yet in this session
+            setShowLocationModal(true);
+        }
+    }, [isSignedIn, isLoaded]);
+
+    const fetchWeatherByCoords = async (lat, lon) => {
+        try {
+            const res = await fetch(
+                `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+            );
+            const data = await res.json();
+
+            if (data.cod == 200) {
+                console.log(`Weather fetched successfully for: ${data.name}`);
+                setWeather({
+                    temp: Math.round(data.main.temp),
+                    condition: data.weather[0].main,
+                    location: data.name,
+                    icon: getWeatherIcon(data.weather[0].main),
+                });
+            } else {
+                console.warn(`Weather API error: ${data.message || "Unknown error"}`);
+            }
+        } catch (error) {
+            console.error("Error fetching weather:", error);
+        }
+    };
+
+    const getWeatherIcon = (condition) => {
+        const icons = {
+            Clear: "☀️",
+            Clouds: "☁️",
+            Rain: "🌧️",
+            Snow: "❄️",
+            Thunderstorm: "⛈️",
+            Drizzle: "🌦️",
+            Mist: "🌫️",
+        };
+        return icons[condition] || "⛅";
+    };
+
+    const handleAllowLocation = () => {
+        if ("geolocation" in navigator) {
+            setIsLocationLoading(true);
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    sessionStorage.setItem("location_consent", "granted");
+                    setLocationAllowed(true);
+                    setIsLocationLoading(false);
+                    setShowLocationModal(false);
+                    // Fetch immediately on first grant
+                    fetchWeatherByCoords(latitude, longitude);
+                },
+                (error) => {
+                    console.warn(`Geolocation error: ${error.message}`);
+                    setIsLocationLoading(false);
+                    handleDenyLocation();
+                }
+            );
+        } else {
+            handleDenyLocation();
+        }
+    };
+
+    const handleDenyLocation = () => {
+        sessionStorage.setItem("location_consent", "denied");
+        setLocationAllowed(false);
+        setIsLocationLoading(false);
+        setShowLocationModal(false);
+    };
+
+    useEffect(() => {
+        let interval;
+        if (locationAllowed === true) {
+            const updateWeather = () => {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
+                        },
+                        (error) => {
+                            console.warn("Weather refresh failed:", error.message);
+                            if (error.code === 1) setLocationAllowed(false);
+                        }
+                    );
+                }
+            };
+
+            // Only run if weather hasn't been fetched yet (e.g. on mount with existing consent)
+            // or as part of the interval. handleAllowLocation handles the first fetch for new consent.
+            if (!weather) {
+                updateWeather();
+            }
+
+            interval = setInterval(updateWeather, 600000); // 10 mins
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [locationAllowed, weather === null]);
 
     const quickLinks = [
         { name: "Bookmarks", href: "/bookmarks" },
-        { name: "My Profile", href: "/profile" },
-        { name: "Settings", href: "/settings" },
     ];
 
     return (
-        <aside className="space-y-4 sticky top-24 h-fit z-50">
-            {/* Weather Card */}
-            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-3 opacity-20 text-4xl">
-                    {weather?.icon}
-                </div>
-                <div className="relative z-10">
-                    <div className="flex items-center gap-1.5 mb-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">Live Weather</span>
-                    </div>
-                    <h3 className="text-2xl font-bold mb-0.5">{weather ? `${weather.temp}°C` : "--"}</h3>
-                    <p className="font-medium text-sm opacity-90">{weather?.condition}</p>
-                    <p className="text-[10px] opacity-75 mt-2 flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {weather?.location}
-                    </p>
-                </div>
-            </div>
+        <>
+            <AnimatePresence>
+                {showLocationModal && (
+                    <LocationModal
+                        onAllow={handleAllowLocation}
+                        onDeny={handleDenyLocation}
+                        isLoading={isLocationLoading}
+                    />
+                )}
+            </AnimatePresence>
 
-            {/* Trending Categories */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-1.5 mb-3 border-b border-gray-50 pb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Trending Now</h3>
-                </div>
-
-                <div className="space-y-3">
-                    {categories.slice(0, 5).map((cat) => (
-                        <Link
-                            key={cat.slug}
-                            href={`/home/${cat.slug}`}
-                            className="block group"
+            <aside className="space-y-3 sticky top-24 h-fit z-50 max-w-xs transition-all">
+                {/* Weather Card */}
+                <AnimatePresence>
+                    {locationAllowed && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-3 text-white shadow-lg relative overflow-hidden"
                         >
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h4 className={`font-bold text-sm mb-0 group-hover:text-indigo-600 transition-colors ${pathname === `/home/${cat.slug}` ? "text-indigo-600" : "text-gray-900"
-                                        }`}>
-                                        #{cat.name}
-                                    </h4>
-                                    <p className="text-[10px] text-gray-500 font-medium">
-                                        {cat.displayCount} posts
-                                    </p>
-                                </div>
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="text-gray-300 text-xs">•••</span>
-                                </div>
+                            {/* ... (Weather Card content is good in both modes since it's colored) ... */}
+                            <div className="absolute top-0 right-0 p-3 opacity-20 text-4xl">
+                                {weather?.icon || "⛅"}
                             </div>
-                        </Link>
-                    ))}
-                </div>
-            </div>
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-1.5 mb-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-90">Live Weather</span>
+                                </div>
 
-            {/* Quick Links */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <h3 className="text-xs font-bold text-gray-900 mb-2 border-b border-gray-100 pb-2 uppercase tracking-wide">Quick Links</h3>
-                <div className="space-y-1">
-                    {quickLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            className="block px-2 py-1.5 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-all"
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
+                                {weather ? (
+                                    <>
+                                        <h3 className="text-2xl font-bold mb-0.5">{weather.temp}°C</h3>
+                                        <p className="font-medium text-sm opacity-90">{weather.condition}</p>
+                                        <p className="text-[10px] opacity-75 mt-2 flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            {weather.location}
+                                        </p>
+                                    </>
+                                ) : (
+                                    <div className="py-2">
+                                        <p className="text-sm font-medium">Fetching weather...</p>
+                                        <p className="text-[10px] opacity-70 mt-1">If this takes too long, please ensure your OpenWeather API key is valid in .env.local</p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Trending Categories */}
+                <div className="bg-white dark:bg-gray-900 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
+                    <div className="flex items-center gap-1.5 mb-2 border-b border-gray-50 dark:border-gray-800 pb-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Trending Now</h3>
+                    </div>
+
+                    <div className="space-y-2.5">
+                        {categories.slice(0, 6).map((cat, index) => (
+                            <Link
+                                key={cat.slug}
+                                href={`/home/${cat.slug}`}
+                                className="block group items-center"
+                            >
+                                <div className="flex gap-3">
+                                    <span className="text-xl font-black text-gray-100 dark:text-gray-800 group-hover:text-indigo-50 dark:group-hover:text-indigo-900 transition-colors">
+                                        0{index + 1}
+                                    </span>
+                                    <div className="flex-1">
+                                        <h4 className={`font-bold text-sm mb-0 transition-colors ${pathname === `/home/${cat.slug}` ? "text-indigo-600" : "text-gray-900 dark:text-gray-100 group-hover:text-indigo-600"
+                                            }`}>
+                                            {cat.name}
+                                        </h4>
+                                        <p className="text-[10px] text-indigo-600/70 font-bold uppercase tracking-wider">
+                                            {cat.displayCount} articles
+                                        </p>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </aside>
+
+                <div className="bg-white dark:bg-gray-900 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
+                    <h3 className="text-[10px] font-bold text-gray-900 dark:text-gray-100 mb-1.5 border-b border-gray-100 dark:border-gray-800 pb-1.5 uppercase tracking-wide">Quick Links</h3>
+                    <div className="space-y-1">
+                        {quickLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                href={link.href}
+                                className="px-2 py-1.5 flex items-center gap-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                                </svg>
+                                {link.name}
+                            </Link>
+                        ))}
+                        <div
+                            onClick={() => clerk.openUserProfile()}
+                            className="relative px-2 py-1.5 flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all cursor-pointer group"
+                        >
+                            <div className="flex items-center gap-3 w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span>Profile</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </>
     );
 }
+
+

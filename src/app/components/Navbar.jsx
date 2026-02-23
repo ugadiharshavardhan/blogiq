@@ -17,10 +17,10 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <div className="bg-white shadow-md">
+    <div className="bg-white dark:bg-gray-900 shadow-md transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
-        <h1 className="text-2xl font-bold text-indigo-600">
+        <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
           BriefIQ
         </h1>
 
@@ -29,11 +29,10 @@ export default function Navbar() {
             <Link
               key={item}
               href={`/home/${item}`}
-              className={`capitalize font-medium transition ${
-                pathname === `/home/${item}`
-                  ? "text-indigo-600 border-b-2 border-indigo-600"
-                  : "text-gray-600 hover:text-indigo-600"
-              }`}
+              className={`capitalize font-medium transition ${pathname === `/home/${item}`
+                ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
+                : "text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                }`}
             >
               {item}
             </Link>

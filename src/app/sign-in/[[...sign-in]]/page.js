@@ -1,13 +1,9 @@
 import { SignIn } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black transition-colors duration-300">
       <SignIn
-        appearance={{
-          baseTheme: dark,
-        }}
         fallbackRedirectUrl="/home"
       />
     </div>
