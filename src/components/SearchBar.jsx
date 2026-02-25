@@ -121,8 +121,6 @@ const SearchBar = ({ initialQuery, onSearch, placeholder = "Search articles...",
                     <span>TO SEARCH</span>
                 </div>
             </form>
-
-            {/* Suggestions Dropdown */}
             {showDropdown && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-2 z-[100] bg-white dark:bg-gray-950 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="p-2">

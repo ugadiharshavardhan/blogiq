@@ -17,8 +17,6 @@ export default function Sidebar() {
     const [showLocationModal, setShowLocationModal] = useState(false);
     const [locationAllowed, setLocationAllowed] = useState(null); // null: undecided, true: allowed, false: withheld
     const [isLocationLoading, setIsLocationLoading] = useState(false);
-
-    // OpenWeather API Key
     const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || "2821101850e0fe14fd269b4c584ac2dd";
 
     useEffect(() => {
@@ -27,7 +25,6 @@ export default function Sidebar() {
             const TWELVE_HOURS = 43200000;
 
             try {
-                // Try cache first
                 const cached = localStorage.getItem(CACHE_KEY);
                 if (cached) {
                     const { counts, timestamp } = JSON.parse(cached);
@@ -36,8 +33,6 @@ export default function Sidebar() {
                         return;
                     }
                 }
-
-                // Fetch fresh
                 const res = await fetch("/api/counts");
                 const data = await res.json();
 
@@ -48,11 +43,9 @@ export default function Sidebar() {
                         timestamp: new Date().getTime()
                     }));
                 } else {
-                    // Fallback to static data if API fails
                     updateCategories({});
                 }
             } catch (err) {
-                console.error("Failed to fetch real counts:", err);
                 updateCategories({});
             }
         };
@@ -69,7 +62,7 @@ export default function Sidebar() {
 
             const formatted = categoryList.map(cat => ({
                 ...cat,
-                displayCount: formatCount(apiCounts[cat.slug] || Math.floor(Math.random() * 500 + 500))
+                displayCount: formatCount(apiCounts[cat.slug] || 0)
             }));
 
             setCategories(formatted);
@@ -84,12 +77,10 @@ export default function Sidebar() {
         fetchCounts();
     }, []);
 
-    // Check for location consent on mount / auth change
     useEffect(() => {
-        if (!isLoaded) return; // Wait for Clerk to load
+        if (!isLoaded) return;
 
         if (!isSignedIn) {
-            // Clear consent on logout so it re-asks on next login
             sessionStorage.removeItem("location_consent");
             setLocationAllowed(null);
             setShowLocationModal(false);
@@ -106,7 +97,6 @@ export default function Sidebar() {
             setLocationAllowed(false);
             setShowLocationModal(false);
         } else {
-            // No decision made yet in this session
             setShowLocationModal(true);
         }
     }, [isSignedIn, isLoaded]);
@@ -119,18 +109,14 @@ export default function Sidebar() {
             const data = await res.json();
 
             if (data.cod == 200) {
-                console.log(`Weather fetched successfully for: ${data.name}`);
                 setWeather({
                     temp: Math.round(data.main.temp),
                     condition: data.weather[0].main,
                     location: data.name,
                     icon: getWeatherIcon(data.weather[0].main),
                 });
-            } else {
-                console.warn(`Weather API error: ${data.message || "Unknown error"}`);
             }
         } catch (error) {
-            console.error("Error fetching weather:", error);
         }
     };
 
@@ -157,11 +143,9 @@ export default function Sidebar() {
                     setLocationAllowed(true);
                     setIsLocationLoading(false);
                     setShowLocationModal(false);
-                    // Fetch immediately on first grant
                     fetchWeatherByCoords(latitude, longitude);
                 },
-                (error) => {
-                    console.warn(`Geolocation error: ${error.message}`);
+                () => {
                     setIsLocationLoading(false);
                     handleDenyLocation();
                 }
@@ -188,24 +172,16 @@ export default function Sidebar() {
                             fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
                         },
                         (error) => {
-                            console.warn("Weather refresh failed:", error.message);
                             if (error.code === 1) setLocationAllowed(false);
                         }
                     );
                 }
             };
 
-            // Only run if weather hasn't been fetched yet (e.g. on mount with existing consent)
-            // or as part of the interval. handleAllowLocation handles the first fetch for new consent.
-            if (!weather) {
-                updateWeather();
-            }
-
-            interval = setInterval(updateWeather, 600000); // 10 mins
+            if (!weather) updateWeather();
+            interval = setInterval(updateWeather, 600000);
         }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
+        return () => interval && clearInterval(interval);
     }, [locationAllowed, weather === null]);
 
     const quickLinks = [
@@ -225,7 +201,6 @@ export default function Sidebar() {
             </AnimatePresence>
 
             <aside className="space-y-3 sticky top-24 h-fit z-50 max-w-xs transition-all">
-                {/* Weather Card */}
                 <AnimatePresence>
                     {locationAllowed && (
                         <motion.div
@@ -234,7 +209,6 @@ export default function Sidebar() {
                             exit={{ opacity: 0, x: 20 }}
                             className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-3 text-white shadow-lg relative overflow-hidden"
                         >
-                            {/* ... (Weather Card content is good in both modes since it's colored) ... */}
                             <div className="absolute top-0 right-0 p-3 opacity-20 text-4xl">
                                 {weather?.icon || "⛅"}
                             </div>
@@ -259,15 +233,12 @@ export default function Sidebar() {
                                 ) : (
                                     <div className="py-2">
                                         <p className="text-sm font-medium">Fetching weather...</p>
-                                        <p className="text-[10px] opacity-70 mt-1">If this takes too long, please ensure your OpenWeather API key is valid in .env.local</p>
                                     </div>
                                 )}
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
-
-                {/* Trending Categories */}
                 <div className="bg-white dark:bg-gray-900 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
                     <div className="flex items-center gap-1.5 mb-2 border-b border-gray-50 dark:border-gray-800 pb-1.5">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

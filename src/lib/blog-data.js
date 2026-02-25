@@ -1,6 +1,5 @@
 
 export const blogs = [
-    // Business
     {
         id: 1,
         category: "business",
@@ -21,8 +20,6 @@ export const blogs = [
         date: "Oct 22, 2023",
         readTime: "7 min",
     },
-
-    // Technology
     {
         id: 3,
         category: "technology",
@@ -43,8 +40,6 @@ export const blogs = [
         date: "Oct 20, 2023",
         readTime: "6 min",
     },
-
-    // Sports
     {
         id: 5,
         category: "sports",
@@ -65,8 +60,6 @@ export const blogs = [
         date: "Oct 19, 2023",
         readTime: "6 min",
     },
-
-    // Entertainment
     {
         id: 7,
         category: "entertainment",
@@ -87,8 +80,6 @@ export const blogs = [
         date: "Oct 18, 2023",
         readTime: "5 min",
     },
-
-    // Health
     {
         id: 9,
         category: "health",
@@ -109,8 +100,6 @@ export const blogs = [
         date: "Oct 17, 2023",
         readTime: "6 min",
     },
-
-    // Science
     {
         id: 11,
         category: "science",

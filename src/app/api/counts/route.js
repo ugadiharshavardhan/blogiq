@@ -35,7 +35,6 @@ export async function GET() {
             timestamp: new Date().getTime()
         });
     } catch (error) {
-        console.error("Error fetching counts:", error);
         return Response.json({ success: false, error: error.message }, { status: 500 });
     }
 }

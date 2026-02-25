@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
-import Sidebar from "@/app/components/Sidebar";
-import { ThemeToggle } from "@/app/components/ThemeToggle";
+import Sidebar from "@/components/Sidebar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function HomeLayout({ children }) {
     const pathname = usePathname();
@@ -29,19 +29,16 @@ export default function HomeLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black flex flex-col transition-colors duration-300">
-            {/* Top Navbar */}
             <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50 shadow-sm transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16 relative">
-
-                        {/* Logo */}
                         <div className="flex-shrink-0 flex items-center">
                             <Link href="/home" className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                                    <span className="text-white font-bold text-xl">B</span>
+                                <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                                    <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
                                 </div>
                                 <span className="text-xl font-bold text-gray-900 dark:text-gray-100 hidden sm:block">
-                                    Blog<span className="text-indigo-600">IQ</span>
+                                    BlogIQ
                                 </span>
                             </Link>
                         </div>
@@ -60,32 +57,24 @@ export default function HomeLayout({ children }) {
                                         className={`relative group inline-flex items-center px-1 pt-1 text-sm transition-colors duration-200 ${isActive ? "text-indigo-600 font-bold" : "text-gray-500 dark:text-gray-400 font-medium hover:text-gray-900 dark:hover:text-white"
                                             }`}
                                     >
-                                        {/* Text content */}
                                         {item.name}
-
-                                        {/* Animated Underline */}
                                         <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 transform origin-center transition-transform duration-300 ease-out ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                                             }`}></span>
                                     </Link>
                                 );
                             })}
                         </div>
-
-                        {/* Right Side: User Button & Mobile Menu Toggle */}
                         <div className="flex items-center gap-4">
                             <ThemeToggle />
                             <div className="min-w-8">
                                 {isMounted && <UserButton afterSignOutUrl="/" />}
                             </div>
-
-                            {/* Mobile menu button */}
                             <div className="flex items-center md:hidden">
                                 <button
                                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                     className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                                 >
                                     <span className="sr-only">Open main menu</span>
-                                    {/* Icon depending on state */}
                                     {isMobileMenuOpen ? (
                                         <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -100,8 +89,6 @@ export default function HomeLayout({ children }) {
                         </div>
                     </div>
                 </div>
-
-                {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -129,16 +116,11 @@ export default function HomeLayout({ children }) {
                     </div>
                 )}
             </nav>
-
-            {/* Main Content Layout */}
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    {/* Left Side: News Content (Scrollable) */}
                     <div className="lg:col-span-3">
                         {children}
                     </div>
-
-                    {/* Right Side: Sidebar (Sticky) */}
                     <div className="hidden lg:block lg:col-span-1">
                         <Sidebar />
                     </div>

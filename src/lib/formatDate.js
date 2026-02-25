@@ -10,16 +10,12 @@ export function formatDate(dateString) {
 
     try {
         const date = new Date(dateString);
-
-        // Format: Oct 24, 2023
         const dateOptions = {
             month: 'short',
             day: 'numeric',
             year: 'numeric'
         };
         const formattedDate = date.toLocaleDateString('en-US', dateOptions);
-
-        // Format: 10:30 AM
         const timeOptions = {
             hour: 'numeric',
             minute: '2-digit',
@@ -29,7 +25,6 @@ export function formatDate(dateString) {
 
         return `${formattedDate} • ${formattedTime}`;
     } catch (error) {
-        console.error("Error formatting date:", error);
         return dateString;
     }
 }
