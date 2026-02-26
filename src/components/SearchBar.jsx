@@ -17,7 +17,7 @@ const SearchBar = ({ initialQuery, onSearch, placeholder = "Search articles...",
             const filtered = articles.filter(article =>
                 article.title?.toLowerCase().includes(searchLower) ||
                 article.description?.toLowerCase().includes(searchLower)
-            ).slice(0, 6); // Limit to 6 suggestions
+            ).slice(0, 6);
             setSuggestions(filtered);
             setShowDropdown(true);
         } else {

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 import DashboardClient from "@/components/DashboardClient";
 
-export const dynamic = "force-dynamic"; // Ensure fresh data on every load
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
     const { userId } = await auth();

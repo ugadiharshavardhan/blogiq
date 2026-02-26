@@ -1,4 +1,4 @@
-export const revalidate = 3600; // Cache for 1 hour at the edge
+export const revalidate = 3600;
 
 export async function GET() {
     const categories = [

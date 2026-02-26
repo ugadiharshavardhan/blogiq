@@ -23,6 +23,9 @@ const BookmarkSchema = new mongoose.Schema({
     category: String,
     publishedAt: String,
     author: String,
+    content: String,
+    isInternal: Boolean,
+    fromCreator: Boolean,
     source: {
         name: String,
         id: String,

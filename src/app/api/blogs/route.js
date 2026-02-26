@@ -6,7 +6,7 @@ export async function GET(req) {
     try {
         await connectDB();
         const { searchParams } = new URL(req.url);
-        const filter = searchParams.get("filter"); // "all", "mine", "public"
+        const filter = searchParams.get("filter");
 
         const { userId } = await auth();
         const user = await currentUser();
@@ -15,9 +15,9 @@ export async function GET(req) {
         let query = { status: "approved" };
 
         if (filter === "all" && role === "admin") {
-            query = {}; // Admin sees everything
+            query = {};
         } else if (filter === "mine" && (role === "creator" || role === "admin") && userId) {
-            query = { authorId: userId }; // Creators see their own (pending, approved, rejected)
+            query = { authorId: userId };
         }
 
         const blogs = await Blog.find(query).sort({ createdAt: -1 });
@@ -63,7 +63,7 @@ export async function POST(req) {
             coverImage,
             authorId: userId,
             authorName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.firstName || "Unknown"),
-            status: "pending", // All new blogs default to pending
+            status: "pending",
         });
 
         return NextResponse.json({ message: "Blog created successfully", blog: newBlog }, { status: 201 });

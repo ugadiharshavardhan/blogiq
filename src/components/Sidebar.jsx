@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { blogs } from "@/lib/blog-data";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import LocationModal from "./LocationModal";
@@ -15,7 +14,7 @@ export default function Sidebar() {
     const [categories, setCategories] = useState([]);
     const [weather, setWeather] = useState(null);
     const [showLocationModal, setShowLocationModal] = useState(false);
-    const [locationAllowed, setLocationAllowed] = useState(null); // null: undecided, true: allowed, false: withheld
+    const [locationAllowed, setLocationAllowed] = useState(null);
     const [isLocationLoading, setIsLocationLoading] = useState(false);
     const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || "2821101850e0fe14fd269b4c584ac2dd";
 

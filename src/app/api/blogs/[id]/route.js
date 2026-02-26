@@ -3,6 +3,13 @@ import { checkRole, checkCreatorStatus } from "@/lib/roles";
 import connectDB from "@/lib/mongodb";
 import Blog from "@/models/Blog";
 import { NextResponse } from "next/server";
+import {
+    sendBrevoEmail,
+    getBlogAcceptanceTemplate,
+    getBlogRejectionTemplate
+} from "@/lib/sendEmail";
+import { clerkClient } from "@clerk/nextjs/server";
+
 export async function GET(req, { params }) {
     try {
         await connectDB();
@@ -57,6 +64,37 @@ export async function PUT(req, { params }) {
             }
 
             await blog.save();
+
+            // Try to notify the creator about the decision
+            try {
+                const clerk = await clerkClient();
+                const authorUser = await clerk.users.getUser(blog.authorId);
+                const authorEmail = authorUser.emailAddresses[0]?.emailAddress;
+                const authorName = authorUser.firstName || "Creator";
+
+                if (authorEmail) {
+                    if (body.status === "approved") {
+                        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://next-blog-app-iota.vercel.app";
+                        const articleUrl = `${appUrl}/blog/${blog.slug}/details/${blog._id}`;
+                        await sendBrevoEmail(
+                            authorEmail,
+                            authorName,
+                            "Your blog post has been approved!",
+                            getBlogAcceptanceTemplate(authorName, blog.title, articleUrl)
+                        );
+                    } else if (body.status === "rejected") {
+                        await sendBrevoEmail(
+                            authorEmail,
+                            authorName,
+                            "Update on your BlogIQ submission",
+                            getBlogRejectionTemplate(authorName, blog.title, blog.rejectionReason)
+                        );
+                    }
+                }
+            } catch (emailError) {
+                console.error("Failed to send moderation email to author:", emailError);
+            }
+
             return NextResponse.json({ message: `Blog ${body.status} successfully`, blog });
         }
         if (isAdmin || (isCreator && String(blog.authorId) === String(userId))) {
@@ -65,10 +103,9 @@ export async function PUT(req, { params }) {
             if (body.content) blog.content = body.content;
             if (body.excerpt !== undefined) blog.excerpt = body.excerpt;
             if (body.coverImage !== undefined) blog.coverImage = body.coverImage;
-            if (!isAdmin) {
-                blog.status = "pending";
-                blog.rejectionReason = null;
-            }
+            // Every creator edit resets it to pending review
+            blog.status = "pending";
+            blog.rejectionReason = null;
 
             await blog.save();
             return NextResponse.json({ message: "Blog updated successfully", blog });

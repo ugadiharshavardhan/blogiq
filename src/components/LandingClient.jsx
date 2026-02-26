@@ -110,7 +110,7 @@ export default function LandingClient() {
                     </div>
                 </div>
             </nav>
-            <section className="relative pt-52 pb-32 overflow-hidden">
+            <section className="relative pt-32 pb-20 md:pb-32 overflow-hidden">
                 <div className="absolute inset-0 -z-10 dot-pattern opacity-5 dark:opacity-10"></div>
                 <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                     <motion.div

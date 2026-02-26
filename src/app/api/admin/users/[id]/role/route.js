@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { checkRole } from "@/lib/roles";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import { sendBrevoEmail, getCreatorAcceptanceTemplate, getCreatorRejectionTemplate } from "@/lib/sendEmail";
 
 export async function PUT(req, { params }) {
     try {
@@ -60,6 +61,27 @@ export async function PUT(req, { params }) {
             },
             { upsert: true, new: true }
         );
+        // Send emails asynchronously (don't block the response)
+        const targetEmail = user.emailAddresses[0]?.emailAddress;
+        const targetName = user.firstName || "Creator";
+
+        if (targetEmail) {
+            if (action === "upgrade") {
+                sendBrevoEmail(
+                    targetEmail,
+                    targetName,
+                    "Application Approved: Welcome to BlogIQ Creators! 🎉",
+                    getCreatorAcceptanceTemplate(targetName)
+                ).catch(console.error); // Silently catch email errors
+            } else if (action === "reject_application") {
+                sendBrevoEmail(
+                    targetEmail,
+                    targetName,
+                    "Update on your BlogIQ Creator Application",
+                    getCreatorRejectionTemplate(targetName)
+                ).catch(console.error);
+            }
+        }
 
         return NextResponse.json({ message: `User privileges updated successfully.` });
     } catch (error) {

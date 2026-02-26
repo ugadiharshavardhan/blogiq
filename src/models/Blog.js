@@ -16,7 +16,7 @@ const BlogSchema = new mongoose.Schema(
             required: true,
         },
         content: {
-            type: String, // Rich text HTML
+            type: String,
             required: true,
         },
         excerpt: {
