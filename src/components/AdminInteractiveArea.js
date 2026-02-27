@@ -85,7 +85,7 @@ export default function AdminInteractiveArea({ blogs, pendingCreators = [] }) {
 
     return (
         <div>
-            <div className="flex space-x-2 mb-6 p-1 bg-gray-200 dark:bg-gray-900 rounded-xl w-fit overflow-x-auto">
+            <div className="flex space-x-2 mb-6 p-1 bg-gray-200 dark:bg-gray-900 rounded-xl w-full max-w-full overflow-x-auto snap-x hide-scrollbar">
                 {[
                     { id: "apps", label: "Creator Apps" },
                     { id: "pending", label: "Pending Blogs" },
@@ -95,7 +95,7 @@ export default function AdminInteractiveArea({ blogs, pendingCreators = [] }) {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-6 py-2 rounded-lg font-bold text-sm tracking-wide capitalize transition-all whitespace-nowrap ${activeTab === tab.id
+                        className={`px-4 md:px-6 py-2 rounded-lg font-bold text-xs md:text-sm tracking-wide capitalize transition-all whitespace-nowrap snap-start ${activeTab === tab.id
                             ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
                             : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                             }`}

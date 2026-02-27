@@ -199,7 +199,7 @@ export default function Sidebar() {
                 )}
             </AnimatePresence>
 
-            <aside className="space-y-3 sticky top-24 h-fit z-50 max-w-xs transition-all">
+            <aside className="space-y-3 lg:sticky lg:top-24 h-full lg:h-fit z-50 max-w-xs transition-all w-full flex flex-col pb-6">
                 <AnimatePresence>
                     {locationAllowed && (
                         <motion.div

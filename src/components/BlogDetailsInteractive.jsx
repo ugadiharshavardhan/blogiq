@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react";
 import { formatDate } from "@/lib/formatDate";
 import Link from "next/link";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function BlogDetailsInteractive({ serverBlog, paramId }) {
     const [blog, setBlog] = useState(serverBlog);
     const [isBookmarked, setIsBookmarked] = useState(false);
-
-    
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSummarizing, setIsSummarizing] = useState(false);
     const [isStreamFinished, setIsStreamFinished] = useState(false);
     const [targetText, setTargetText] = useState("");
@@ -19,7 +18,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
     const [summaryType, setSummaryType] = useState("bullets");
     const [summaryError, setSummaryError] = useState("");
 
-    
+
     const { scrollYProgress } = useScroll();
     const scaleX = useSpring(scrollYProgress, {
         stiffness: 100,
@@ -28,7 +27,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
     });
 
     useEffect(() => {
-        
+
         if (targetText.length > summaryResult.length) {
             const timeout = setTimeout(() => {
                 const nextChunk = targetText.slice(0, summaryResult.length + 3);
@@ -41,7 +40,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
     }, [targetText, summaryResult, isStreamFinished, isSummarizing]);
 
     useEffect(() => {
-        
+
         let currentBlog = serverBlog;
 
         if (!currentBlog) {
@@ -55,7 +54,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
             }
         }
 
-        
+
         if (currentBlog) {
             fetch("/api/bookmarks")
                 .then(res => res.ok ? res.json() : [])
@@ -186,8 +185,12 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
 
                     <button
                         onClick={() => {
+                            const shareUrl = `http://blogiq-theta.vercel.app${window.location.pathname}`;
                             if (navigator.share) {
-                                navigator.share({ title: blog.title, url: window.location.href });
+                                navigator.share({ title: blog.title, url: shareUrl }).catch(() => { });
+                            } else {
+                                navigator.clipboard.writeText(shareUrl);
+                                alert("Link copied to clipboard!");
                             }
                         }}
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all"
@@ -200,8 +203,52 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
 
                     <div className="h-6 w-px bg-gray-100 dark:bg-gray-800 mx-1"></div>
                     <span className="text-[10px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest hidden sm:block">REF.{(blog.id || blog._id || "").slice(-4).toUpperCase()}</span>
+
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all ml-1"
+                    >
+                        {isMobileMenuOpen ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        )}
+                    </button>
                 </div>
             </header>
+
+            {/* Mobile Sidebar Overlay */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, x: "100%" }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: "100%" }}
+                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                        className="fixed inset-0 z-50 lg:hidden flex justify-end"
+                    >
+                        <div
+                            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
+                        <div className="relative w-[300px] h-full bg-white dark:bg-black shadow-2xl flex flex-col pt-20 px-4 pb-8 overflow-y-auto border-l border-gray-100 dark:border-gray-800">
+                            <button
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-800 rounded-full transition"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <Sidebar />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <main className="pt-24 pb-32">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
@@ -426,7 +473,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
                 <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-8">
                     <div className="flex items-center space-x-3 grayscale opacity-40 dark:opacity-20">
                         <div className="w-6 h-6 rounded-lg overflow-hidden flex items-center justify-center">
-                            <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
+                            <img src="/icon.png" alt="BlogIQ Logo" className="w-full h-full object-cover scale-110" />
                         </div>
                         <span className="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">BlogIQ Editorial</span>
                     </div>

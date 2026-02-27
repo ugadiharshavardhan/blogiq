@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "BlogIQ - Smart Insights and Global Stories",
   description: "A community-driven platform for global insights and news. Knowledge for everyone, forever free.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  }
 };
 
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -25,6 +30,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ThemeProvider>
           <ClerkProviderWrapper>

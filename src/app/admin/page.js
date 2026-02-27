@@ -74,7 +74,7 @@ export default async function AdminPage() {
                             <Link href="/home" className="flex items-center gap-3 group">
                                 <div className="relative w-8 h-8 md:w-10 md:h-10 overflow-hidden rounded-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105">
                                     <img
-                                        src="/logo.png"
+                                        src="/icon.png"
                                         alt="BlogIQ"
                                         className="w-full h-full object-cover rounded-full"
                                     />

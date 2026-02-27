@@ -31,8 +31,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 relative">
           <div className="flex-shrink-0 flex items-center">
             <Link href="/home" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-                <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center">
+                <img src="/icon.png" alt="BlogIQ Logo" className="w-full h-full object-cover scale-110" />
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-gray-100 hidden sm:block">
                 BlogIQ
@@ -124,6 +124,13 @@ export default function Navbar() {
               className="block px-3 py-2 text-indigo-600 dark:text-indigo-400 font-bold text-base"
             >
               Creators Dashboard
+            </Link>
+            <Link
+              href="/bookmarks"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block px-3 py-2 text-indigo-600 dark:text-indigo-400 font-bold text-base"
+            >
+              Bookmarks
             </Link>
           </div>
         </div>

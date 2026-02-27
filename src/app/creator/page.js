@@ -38,7 +38,7 @@ export default function CreatorLandingPage() {
                 <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
                     <Link href="/" className="flex items-center gap-3 group">
                         <div className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg shadow-indigo-500/10 group-hover:scale-105 transition-transform">
-                            <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
+                            <img src="/icon.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
                         </div>
                         <h1 className="text-2xl font-black tracking-tighter">
                             Blog<span className="text-indigo-600">IQ</span>
@@ -130,7 +130,7 @@ export default function CreatorLandingPage() {
             <footer className="py-12 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-black text-center">
                 <div className="flex items-center justify-center gap-3 mb-6 opacity-30 grayscale saturate-0">
                     <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-                        <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
+                        <img src="/icon.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
                     </div>
                     <span className="font-black text-xl italic tracking-tighter text-gray-900 dark:text-white">BlogIQ</span>
                 </div>

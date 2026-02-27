@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Target, ShieldCheck, LifeBuoy, Mail } from "lucide-react";
+import { X, Target, ShieldCheck, LifeBuoy, Mail, Lock, FileText } from "lucide-react";
 
 export default function InfoModal({ isOpen, onClose, type }) {
     const content = {
@@ -43,6 +43,26 @@ export default function InfoModal({ isOpen, onClose, type }) {
                 "General Inquiries: hello@blogiq.com",
                 "Creator Partnerships: creators@blogiq.com",
                 "Follow us on Twitter: @BlogIQ"
+            ]
+        },
+        privacy: {
+            title: "Privacy Policy",
+            icon: <Lock className="w-8 h-8 text-slate-500" />,
+            description: "We take your privacy seriously. This policy outlines how we handle your data, ensuring your information is secure and your reading experience remains private and uncompromised.",
+            highlights: [
+                "Transparent data collection practices",
+                "No third-party data selling",
+                "Industry-standard security measures"
+            ]
+        },
+        terms: {
+            title: "Terms of Service",
+            icon: <FileText className="w-8 h-8 text-amber-500" />,
+            description: "By using BlogIQ, you agree to our terms of service which are designed to keep our platform safe, fair, and focused on delivering high-quality content to our users.",
+            highlights: [
+                "Clear user rights and responsibilities",
+                "Intellectual property protections",
+                "Community-first moderation policies"
             ]
         }
     };

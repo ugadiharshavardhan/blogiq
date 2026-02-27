@@ -93,11 +93,11 @@ export default function DashboardClient({ initialBlogs }) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <Link href="/home" className="flex items-center gap-3 group">
-                            <div className="relative w-8 h-8 md:w-10 md:h-10 overflow-hidden rounded-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105">
+                            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105">
                                 <img
-                                    src="/logo.png"
+                                    src="/icon.png"
                                     alt="BlogIQ"
-                                    className="w-full h-full object-cover rounded-full"
+                                    className="w-full h-full object-cover scale-110 rounded-full"
                                 />
                             </div>
                             <span className="text-2xl md:text-3xl font-black tracking-tight text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">

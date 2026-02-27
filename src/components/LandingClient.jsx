@@ -60,7 +60,9 @@ export default function LandingClient() {
             "Our Goal": "goal",
             "Guidelines": "guidelines",
             "Support": "support",
-            "Contact": "contact"
+            "Contact": "contact",
+            "Privacy": "privacy",
+            "Terms": "terms"
         };
         setActiveInfoModal(typeMap[linkName]);
     };
@@ -74,17 +76,17 @@ export default function LandingClient() {
                 type={activeInfoModal}
             />
             <nav className="fixed top-0 w-full z-[100] glass-effect h-20 border-b border-gray-100 dark:border-white/5">
-                <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg shadow-indigo-500/10">
-                            <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
+                <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex justify-between items-center">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <div className="w-9 h-9 md:w-12 md:h-12 shrink-0 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg shadow-indigo-500/10">
+                            <img src="/icon.png" alt="BlogIQ Logo" className="w-full h-full object-cover scale-110" />
                         </div>
-                        <h1 className="text-2xl font-black tracking-tighter">
+                        <h1 className="text-xl md:text-2xl font-black tracking-tighter">
                             BlogIQ
                         </h1>
                     </div>
 
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-3 md:gap-8">
                         <nav className="hidden lg:flex gap-10 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">
                             <button onClick={() => setActiveInfoModal('goal')} className="hover:text-indigo-600 transition-colors uppercase tracking-[0.3em] cursor-pointer">Goal</button>
                             <a href="#explore" className="hover:text-indigo-600 transition-colors">Stories</a>
@@ -95,14 +97,14 @@ export default function LandingClient() {
                         </nav>
                         <div className="h-6 w-px bg-gray-100 dark:bg-gray-800 hidden lg:block"></div>
                         <ThemeToggle />
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                             <Link href="/sign-in">
-                                <button className="text-xs font-black uppercase tracking-widest hover:text-indigo-600 transition-colors cursor-pointer">
+                                <button className="text-[10px] md:text-xs font-black uppercase tracking-normal md:tracking-widest hover:text-indigo-600 transition-colors cursor-pointer hidden min-[360px]:block">
                                     Log In
                                 </button>
                             </Link>
                             <Link href="/sign-up">
-                                <button className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                                <button className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-3 py-1.5 md:px-8 md:py-3.5 rounded-xl md:rounded-2xl text-[9px] md:text-xs font-black uppercase tracking-wider md:tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer">
                                     Join Free
                                 </button>
                             </Link>
@@ -112,7 +114,7 @@ export default function LandingClient() {
             </nav>
             <section className="relative pt-32 pb-20 md:pb-32 overflow-hidden">
                 <div className="absolute inset-0 -z-10 dot-pattern opacity-5 dark:opacity-10"></div>
-                <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                <div className="max-w-7xl mx-auto px-6 flex flex-col-reverse lg:grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -130,10 +132,10 @@ export default function LandingClient() {
                             The simplest way to read global news and community blogs. No paywalls, no complexity. Just high-quality information, for free.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-6">
-                            <Link href="/sign-up">
-                                <button className="px-12 py-6 bg-indigo-600 text-white rounded-[2rem] font-black text-xl shadow-2xl shadow-indigo-500/20 hover:bg-indigo-700 hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-4 group cursor-pointer">
+                            <Link href="/sign-up" className="w-full sm:w-auto">
+                                <button className="w-full sm:w-auto justify-center px-4 py-3 sm:px-12 sm:py-6 bg-indigo-600 text-white rounded-[2rem] font-black text-sm sm:text-xl shadow-2xl shadow-indigo-500/20 hover:bg-indigo-700 hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-2 sm:gap-4 group cursor-pointer">
                                     Start Reading Free
-                                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                                    <ArrowRight className="w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </Link>
                         </div>
@@ -174,7 +176,7 @@ export default function LandingClient() {
             </section>
             <section className="py-40 bg-white dark:bg-black relative overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="bg-indigo-50 dark:bg-indigo-950/20 rounded-[4rem] p-12 md:p-20 border border-indigo-100 dark:border-indigo-900/50 flex flex-col lg:flex-row items-center gap-16">
+                    <div className="bg-indigo-50 dark:bg-indigo-950/20 rounded-[4rem] p-10 md:p-20 border border-indigo-100 dark:border-indigo-900/50 flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-16">
                         <div className="flex-1">
                             <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full mb-8">
                                 <Star className="w-3 h-3 fill-current" />
@@ -202,7 +204,7 @@ export default function LandingClient() {
                                 ))}
                             </div>
                             <Link href="/creator">
-                                <button className="px-10 py-5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-transform active:scale-95 shadow-xl cursor-pointer">
+                                <button className="px-5 py-3 md:px-10 md:py-5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl md:rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest hover:scale-105 transition-transform active:scale-95 shadow-xl cursor-pointer">
                                     Become a Creator
                                 </button>
                             </Link>
@@ -257,7 +259,7 @@ export default function LandingClient() {
                             Join thousands of readers and creators. Always free, forever community-driven.
                         </p>
                         <Link href="/sign-up">
-                            <button className="px-12 py-5 bg-white text-black dark:text-gray-900 rounded-2xl font-black text-lg hover:scale-105 transition-transform active:scale-95 shadow-xl cursor-pointer relative z-10">
+                            <button className="px-5 py-3 md:px-12 md:py-5 bg-white text-black dark:text-gray-900 rounded-xl md:rounded-2xl font-black text-sm md:text-lg hover:scale-105 transition-transform active:scale-95 shadow-xl cursor-pointer relative z-10">
                                 Create Free Account
                             </button>
                         </Link>
@@ -270,7 +272,7 @@ export default function LandingClient() {
                         <div className="max-w-sm">
                             <div className="flex items-center gap-3 mb-8">
                                 <div className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center">
-                                    <img src="/logo.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
+                                    <img src="/icon.png" alt="BlogIQ Logo" className="w-full h-full object-cover" />
                                 </div>
                                 <h2 className="text-xl font-black tracking-tighter italic">Blog<span className="text-indigo-600">IQ</span></h2>
                             </div>
@@ -315,7 +317,7 @@ export default function LandingClient() {
                                         { name: "Guidelines", type: "modal" },
                                         { name: "Support", type: "modal" },
                                         { name: "Contact", type: "modal" },
-                                        { name: "Creator", path: "/creator", type: "route" }
+                                        { name: "Creator", path: portfolioUrl, type: "external" }
                                     ]
                                 },
                                 {

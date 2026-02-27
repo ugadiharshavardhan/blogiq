@@ -26,7 +26,7 @@ export default function BlogCard({ blog, category }) {
         e.preventDefault();
         e.stopPropagation();
 
-        const shareUrl = `${window.location.origin}/blog/${slug}/details/${blog.id}`;
+        const shareUrl = `http://blogiq-theta.vercel.app/blog/${slug}/details/${blog.id}`;
 
         if (navigator.share && navigator.canShare && navigator.canShare({ url: shareUrl })) {
             try {
