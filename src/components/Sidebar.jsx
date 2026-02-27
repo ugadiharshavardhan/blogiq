@@ -20,7 +20,7 @@ export default function Sidebar() {
 
     useEffect(() => {
         const fetchCounts = async () => {
-            const CACHE_KEY = "category_counts_cache";
+            const CACHE_KEY = "category_counts_cache_v3";
             const TWELVE_HOURS = 43200000;
 
             try {
@@ -59,10 +59,23 @@ export default function Sidebar() {
                 { name: "Science", slug: "science" }
             ];
 
-            const formatted = categoryList.map(cat => ({
-                ...cat,
-                displayCount: formatCount(apiCounts[cat.slug] || 0)
-            }));
+            const formatted = categoryList.map(cat => {
+                const countData = apiCounts[cat.slug];
+                let count = 0;
+
+                if (typeof countData === 'number') {
+                    count = countData;
+                } else if (countData && typeof countData.total === 'number') {
+                    count = countData.total;
+                } else if (countData && typeof countData.count === 'number') {
+                    count = countData.count;
+                }
+
+                return {
+                    ...cat,
+                    displayCount: formatCount(count)
+                };
+            });
 
             setCategories(formatted);
         };

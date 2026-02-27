@@ -25,6 +25,12 @@ const nextConfig = {
         hostname: "**",
       }
     ],
+    localPatterns: [
+      {
+        pathname: "/api/image-proxy",
+        search: "?url=*",
+      },
+    ],
   },
   async headers() {
     return [
