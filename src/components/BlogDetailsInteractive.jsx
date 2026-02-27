@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Image from "next/image";
 
 export default function BlogDetailsInteractive({ serverBlog, paramId }) {
     const [blog, setBlog] = useState(serverBlog);
@@ -279,12 +280,15 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
 
                                 {blog.urlToImage && (
                                     <figure className="mb-16">
-                                        <div className="aspect-[21/10] bg-gray-50 dark:bg-gray-900/50 overflow-hidden rounded-2xl md:rounded-[2rem]">
-                                            <img
+                                        <div className="relative aspect-[21/10] bg-gray-50 dark:bg-gray-900/50 overflow-hidden rounded-2xl md:rounded-[2rem]">
+                                            <Image
                                                 src={blog.urlToImage}
-                                                alt={blog.title}
-                                                className="w-full h-full object-cover"
-                                                referrerPolicy="no-referrer"
+                                                alt={blog.title || "Article Banner"}
+                                                fill
+                                                priority
+                                                sizes="(max-width: 1024px) 100vw, 75vw"
+                                                className="object-cover"
+                                                crossOrigin="anonymous"
                                             />
                                         </div>
                                         {blog.description && (

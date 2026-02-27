@@ -14,10 +14,12 @@ export async function fetchNews(category = null) {
 
     let externalArticles = [];
     try {
-        const res = await fetch(
-            `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=100&apiKey=${process.env.NEWS_API_KEY}`,
-            { next: { revalidate: 300 } }
-        );
+        // Use top-headlines for immediate breaking news, and forcefully disable all Next.js fetch caching
+        const endpoint = query === "latest world news"
+            ? `https://newsapi.org/v2/top-headlines?language=en&pageSize=100&apiKey=${process.env.NEWS_API_KEY}`
+            : `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=100&apiKey=${process.env.NEWS_API_KEY}`;
+
+        const res = await fetch(endpoint, { cache: 'no-store' });
         const apiData = await res.json();
         if (apiData.articles) {
             const seenUrls = new Set();

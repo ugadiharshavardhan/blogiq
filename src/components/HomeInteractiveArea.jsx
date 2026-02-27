@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BlogCard from "@/components/BlogCard";
 import SearchBar from "@/components/SearchBar";
 
 export default function HomeInteractiveArea({ initialArticles = [], userFirstName = "Guest" }) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const greeting = () => {
+        if (!mounted) return "Welcome";
         const hour = new Date().getHours();
         if (hour < 12) return "Good Morning";
         if (hour < 18) return "Good Afternoon";
@@ -55,7 +61,7 @@ export default function HomeInteractiveArea({ initialArticles = [], userFirstNam
                         </p>
                     )}
                     <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 md:space-y-0">
-                        {filtered.map((article, index) => (
+                        {mounted && filtered.map((article, index) => (
                             <div key={index} className="break-inside-avoid mb-6">
                                 <BlogCard blog={article} />
                             </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatDate } from "@/lib/formatDate";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function BlogCard({ blog, category }) {
@@ -72,11 +73,14 @@ export default function BlogCard({ blog, category }) {
                 </div>
 
                 {blog.urlToImage && !imageError ? (
-                    <img
+                    <Image
                         src={blog.urlToImage}
-                        alt={blog.title}
-                        className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-                        referrerPolicy="no-referrer"
+                        alt={blog.title || "Blog Image"}
+                        fill
+                        unoptimized={true}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className={`object-cover transition-transform duration-700 group-hover:scale-110 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+                        crossOrigin="anonymous"
                         onLoad={() => setImageLoaded(true)}
                         onError={() => setImageError(true)}
                     />
