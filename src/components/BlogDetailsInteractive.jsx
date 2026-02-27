@@ -282,13 +282,12 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
                                     <figure className="mb-16">
                                         <div className="relative aspect-[21/10] bg-gray-50 dark:bg-gray-900/50 overflow-hidden rounded-2xl md:rounded-[2rem]">
                                             <Image
-                                                src={blog.urlToImage}
+                                                src={`/api/image-proxy?url=${encodeURIComponent(blog.urlToImage)}`}
                                                 alt={blog.title || "Article Banner"}
                                                 fill
                                                 priority
                                                 sizes="(max-width: 1024px) 100vw, 75vw"
                                                 className="object-cover"
-                                                crossOrigin="anonymous"
                                             />
                                         </div>
                                         {blog.description && (

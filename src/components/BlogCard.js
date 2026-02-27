@@ -74,13 +74,12 @@ export default function BlogCard({ blog, category }) {
 
                 {blog.urlToImage && !imageError ? (
                     <Image
-                        src={blog.urlToImage}
+                        src={`/api/image-proxy?url=${encodeURIComponent(blog.urlToImage)}`}
                         alt={blog.title || "Blog Image"}
                         fill
                         unoptimized={true}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className={`object-cover transition-transform duration-700 group-hover:scale-110 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
-                        crossOrigin="anonymous"
                         onLoad={() => setImageLoaded(true)}
                         onError={() => setImageError(true)}
                     />

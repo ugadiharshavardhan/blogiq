@@ -233,7 +233,7 @@ export default function AdminInteractiveArea({ blogs, pendingCreators = [] }) {
                         <div className="flex-1 p-6 md:p-10 overflow-y-auto">
                             <div className="prose prose-lg dark:prose-invert prose-indigo max-w-none">
                                 {viewingBlog.coverImage && (
-                                    <img src={viewingBlog.coverImage} alt="Cover" className="w-full h-auto max-h-[500px] object-cover rounded-2xl mb-8" />
+                                    <img src={`/api/image-proxy?url=${encodeURIComponent(viewingBlog.coverImage)}`} alt="Cover" className="w-full h-auto max-h-[500px] object-cover rounded-2xl mb-8" />
                                 )}
                                 <div dangerouslySetInnerHTML={{ __html: viewingBlog.content }} />
                             </div>

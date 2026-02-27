@@ -6,6 +6,18 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "images.adsttc.com",
+      },
+      {
+        protocol: "https",
+        hostname: "static.toiimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "thechronicle.com.gh",
+      },
+      {
+        protocol: "https",
         hostname: "**",
       },
       {

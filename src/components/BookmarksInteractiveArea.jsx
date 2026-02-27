@@ -26,10 +26,9 @@ const BookmarkCard = ({ blog, onDelete }) => {
             <div className="relative w-full md:w-40 h-32 md:h-28 flex-shrink-0 overflow-hidden rounded-2xl">
                 {blog.urlToImage ? (
                     <img
-                        src={blog.urlToImage}
+                        src={`/api/image-proxy?url=${encodeURIComponent(blog.urlToImage)}`}
                         alt={blog.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        referrerPolicy="no-referrer"
                     />
                 ) : (
                     <div className="w-full h-full bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center">

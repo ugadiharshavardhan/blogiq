@@ -221,7 +221,7 @@ export default function DashboardClient({ initialBlogs }) {
                                 {selectedBlogForView.coverImage && (
                                     <div className="aspect-[21/10] bg-gray-50 dark:bg-gray-900/50 overflow-hidden rounded-xl mb-8">
                                         <img
-                                            src={selectedBlogForView.coverImage}
+                                            src={`/api/image-proxy?url=${encodeURIComponent(selectedBlogForView.coverImage)}`}
                                             alt={selectedBlogForView.title}
                                             className="w-full h-full object-cover"
                                         />
