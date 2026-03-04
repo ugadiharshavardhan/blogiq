@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import connectDB from "@/lib/mongodb";
 import Blog from "@/models/Blog";
+import BlogView from "@/models/BlogView";
 
 export async function fetchNews(category = null) {
     let query = "latest world news";
@@ -74,6 +75,26 @@ export async function fetchNews(category = null) {
         const dateB = new Date(b.publishedAt || 0).getTime();
         return dateB - dateA;
     });
+
+    try {
+        await connectDB();
+        const articleIds = combinedArticles.map(a => a.id);
+        const viewsRecords = await BlogView.find({ blogId: { $in: articleIds } }).lean();
+
+        const viewsMap = {};
+        viewsRecords.forEach(record => {
+            viewsMap[record.blogId] = record.views;
+        });
+
+        combinedArticles.forEach(article => {
+            article.views = viewsMap[article.id] || 0;
+        });
+    } catch (err) {
+        console.error("Error fetching views for articles:", err);
+        combinedArticles.forEach(article => {
+            article.views = 0;
+        });
+    }
 
     return combinedArticles;
 }

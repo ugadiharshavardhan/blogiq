@@ -18,6 +18,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
     const [summaryResult, setSummaryResult] = useState("");
     const [summaryType, setSummaryType] = useState("bullets");
     const [summaryError, setSummaryError] = useState("");
+    const [viewCount, setViewCount] = useState(serverBlog?.views || 0);
 
 
     const { scrollYProgress } = useScroll();
@@ -65,6 +66,55 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
                     }
                 })
                 .catch(() => { });
+
+            setViewCount(currentBlog.views || 0);
+
+            const blogIdToUpdate = currentBlog.id || currentBlog._id;
+            const viewedBlogsStr = localStorage.getItem("viewedBlogs") || "[]";
+            let viewedBlogs = [];
+            try { viewedBlogs = JSON.parse(viewedBlogsStr); } catch (e) { }
+
+            const updateCacheAndUI = (views) => {
+                setViewCount(views);
+
+                // Keep the cross-component cache fresh
+                const viewsCache = JSON.parse(localStorage.getItem('blogViewsCache') || '{}');
+                viewsCache[blogIdToUpdate] = views;
+                localStorage.setItem('blogViewsCache', JSON.stringify(viewsCache));
+
+                // Dispatch custom event for immediate UI updates on the same screen
+                if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent('blogViewUpdated', {
+                        detail: { blogId: blogIdToUpdate, views }
+                    }));
+                }
+            };
+
+            if (!viewedBlogs.includes(blogIdToUpdate)) {
+                fetch("/api/views", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ blogId: blogIdToUpdate }),
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.views !== undefined) {
+                            viewedBlogs.push(blogIdToUpdate);
+                            localStorage.setItem("viewedBlogs", JSON.stringify(viewedBlogs));
+                            updateCacheAndUI(data.views);
+                        }
+                    })
+                    .catch(() => { });
+            } else {
+                fetch(`/api/views?blogId=${blogIdToUpdate}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.views !== undefined) {
+                            updateCacheAndUI(data.views);
+                        }
+                    })
+                    .catch(() => { });
+            }
         }
         window.scrollTo(0, 0);
     }, [serverBlog, paramId]);
@@ -186,7 +236,7 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
 
                     <button
                         onClick={() => {
-                            const shareUrl = `http://blogiq-theta.vercel.app${window.location.pathname}`;
+                            const shareUrl = `https://blogiq-theta.vercel.app${window.location.pathname}`;
                             if (navigator.share) {
                                 navigator.share({ title: blog.title, url: shareUrl }).catch(() => { });
                             } else {
@@ -261,6 +311,14 @@ export default function BlogDetailsInteractive({ serverBlog, paramId }) {
                                         <span className="text-[11px] font-black uppercase tracking-[0.2em]">{blog.category || "General"}</span>
                                         <span className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800"></span>
                                         <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">{blog.readTime || "5 MIN READ"}</span>
+                                        <span className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-800"></span>
+                                        <div className="flex items-center text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest gap-1">
+                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            {viewCount} VIEWS
+                                        </div>
                                     </div>
 
                                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-gray-100 tracking-tight leading-[1.05] mb-8">

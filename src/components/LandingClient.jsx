@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InfoModal from "./InfoModal";
 import {
     Zap,
@@ -25,6 +25,27 @@ import {
 export default function LandingClient() {
     const { isSignedIn, user } = useUser();
     const [activeInfoModal, setActiveInfoModal] = useState(null);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
+
+        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+        return () => {
+            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+        };
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        setDeferredPrompt(null);
+    };
 
     const portfolioUrl = "https://harshavardhanportfolio-beige.vercel.app/";
 
@@ -367,7 +388,18 @@ export default function LandingClient() {
                     </div>
 
                     <div className="pt-10 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.4em] text-gray-300 dark:text-gray-800">
-                        <span>&copy; {new Date().getFullYear()} BLOGIQ COMMUNITY</span>
+                        <div className="flex items-center gap-4">
+                            <span>&copy; {new Date().getFullYear()} BLOGIQ COMMUNITY</span>
+                            {deferredPrompt && (
+                                <button
+                                    onClick={handleInstallClick}
+                                    className="px-4 py-2 bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 rounded-full hover:bg-indigo-600 hover:text-white transition-all cursor-pointer shadow-sm"
+                                    title="Install App"
+                                >
+                                    Install App
+                                </button>
+                            )}
+                        </div>
                         <div className="flex gap-8">
                             <span>Human Knowledge</span>
                             <span>Open & Free</span>

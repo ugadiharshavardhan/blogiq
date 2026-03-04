@@ -15,11 +15,28 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "BlogIQ - Smart Insights and Global Stories",
   description: "A community-driven platform for global insights and news. Knowledge for everyone, forever free.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
     apple: "/icon.png",
-  }
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "BlogIQ",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport = {
+  themeColor: "#0d6efd",
+  minimumScale: 1,
+  initialScale: 1,
+  width: "device-width",
+  viewportFit: "cover",
 };
 
 import { ThemeProvider } from "@/components/ThemeProvider";
